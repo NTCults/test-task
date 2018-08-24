@@ -2,7 +2,10 @@ package utils
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"os"
+	"strconv"
 )
 
 func ResponseJSON(w http.ResponseWriter, status int, payload interface{}) {
@@ -19,4 +22,17 @@ func ResponseJSON(w http.ResponseWriter, status int, payload interface{}) {
 
 func ResponseError(w http.ResponseWriter, code int, message string) {
 	ResponseJSON(w, code, map[string]string{"error": message})
+}
+
+func Getenv(key string, defaultVal int) int {
+	value := os.Getenv(key)
+
+	if len(value) == 0 {
+		return defaultVal
+	}
+	intValue, err := strconv.Atoi(value)
+	if err != nil {
+		log.Fatalf("Wrong environment variable value: '%s:%s'", key, value)
+	}
+	return intValue
 }

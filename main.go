@@ -1,16 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"test-task/utils"
+	"time"
 )
 
 func main() {
-	var taskQueue = make(chan TaskRequest, 100)
+	port := utils.Getenv("PORT", 8080)
+	numWorkers := utils.Getenv("WORKERS", 5)
+	timeout := utils.Getenv("TIMEOUT", 15)
+	queueSize := utils.Getenv("QUEUE_SIZE", 100)
+
+	var taskQueue = make(chan TaskRequest, queueSize)
 	var exitCh = make(chan struct{})
-	port := ":8080"
+
 	repo := initRepo()
-	numWorkers := 5
 	for i := 0; i < numWorkers; i++ {
 		workerID := i
 		wr := worker{
@@ -21,7 +28,13 @@ func main() {
 		}
 		wr.start()
 	}
+	srv := &http.Server{
+		Handler:      newService(&repo, taskQueue),
+		Addr:         fmt.Sprintf("0.0.0.0:%d", port),
+		WriteTimeout: time.Duration(timeout) * time.Second,
+		ReadTimeout:  time.Duration(timeout) * time.Second,
+	}
 
 	log.Println("Listening on port", port)
-	log.Fatal(http.ListenAndServe(port, newService(&repo, taskQueue)))
+	log.Fatal(srv.ListenAndServe())
 }
