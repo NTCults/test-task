@@ -16,7 +16,16 @@ const (
 	defaultPageNum  = 1
 )
 
-func new(repo Repository) http.Handler {
+type taskService struct {
+	repo Repository
+	mux  *mux.Router
+}
+
+func (s *taskService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.mux.ServeHTTP(w, r)
+}
+
+func newService(repo Repository) http.Handler {
 	mux := mux.NewRouter()
 	service := &taskService{repo, mux}
 
@@ -26,15 +35,6 @@ func new(repo Repository) http.Handler {
 	mux.HandleFunc("/task/{ID}", service.deleteTask).Methods("DELETE")
 
 	return service
-}
-
-func (s *taskService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.mux.ServeHTTP(w, r)
-}
-
-type taskService struct {
-	repo Repository
-	mux  *mux.Router
 }
 
 func (taskService) createTask(w http.ResponseWriter, req *http.Request) {

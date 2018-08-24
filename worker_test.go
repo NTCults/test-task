@@ -76,7 +76,6 @@ func TestWorker(t *testing.T) {
 
 	testJSONHeader, ok := result.Headers["Testjson"]
 	if !ok || testJSONHeader[0] != "ok" {
-		t.Errorf("Wrong or invalid header %v", result)
+		t.Errorf("Json handling error %v", result)
 	}
-
 }

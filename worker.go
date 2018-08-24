@@ -8,11 +8,10 @@ import (
 )
 
 type worker struct {
-	workerID    int
-	repo        Repository
-	taskQueue   <-chan TaskRequest
-	closed      chan struct{}
-	queueClosed bool
+	workerID  int
+	repo      Repository
+	taskQueue <-chan TaskRequest
+	closed    chan struct{}
 }
 
 func (w *worker) start() {
