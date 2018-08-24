@@ -1,6 +1,6 @@
 #### API:
-    POST    /tasks/            - create resource
-    GET     /tasks/{ID}        - get existing resource
-    GET     /tasks/            - get list of resources sorted by date;
-                                    (use query params page and size to navigate)
-    DELETE  /tasks/{ID}        - delete existing resource
+    POST    /task/            - create resource
+    GET     /task/{ID}        - get existing resource
+    GET     /task/            - get list of resources sorted by date;
+                                use query params page and size to navigate
+    DELETE  /task/{ID}        - delete existing resource
