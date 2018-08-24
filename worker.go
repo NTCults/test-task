@@ -1,9 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -27,7 +27,7 @@ func (w *worker) start() {
 
 			client := &http.Client{}
 
-			req, err := http.NewRequest(task.Method, task.URL, strings.NewReader(task.Body))
+			req, err := http.NewRequest(task.Method, task.URL, bytes.NewBuffer(task.Body))
 			if err != nil {
 				log.Printf("[Worker %d] Task %s: %s", w.workerID, task.ID, err)
 				completedTask.Errors = append(completedTask.Errors, err.Error())

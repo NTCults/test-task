@@ -53,7 +53,7 @@ func TestWorker(t *testing.T) {
 	var jsbody = testJSONBody{"ok"}
 	testRequest.Method = "POST"
 	data, _ := json.Marshal(jsbody)
-	testRequest.Body = string(data)
+	testRequest.Body = data
 
 	worker.start()
 	taskQueue <- testRequest

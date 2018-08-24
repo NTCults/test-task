@@ -13,7 +13,7 @@ type TaskRequest struct {
 	Method  string            `json:"method"`
 	URL     string            `json:"url"`
 	Headers map[string]string `json:"headers"`
-	Body    string            `json:"body"`
+	Body    []byte            `json:"body"`
 }
 
 // Validate is a TaskRequest validator

@@ -17,17 +17,18 @@ const (
 )
 
 type taskService struct {
-	repo Repository
-	mux  *mux.Router
+	repo      Repository
+	mux       *mux.Router
+	taskQueue chan<- TaskRequest
 }
 
 func (s *taskService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mux.ServeHTTP(w, r)
 }
 
-func newService(repo Repository) http.Handler {
+func newService(repo Repository, queue chan<- TaskRequest) http.Handler {
 	mux := mux.NewRouter()
-	service := &taskService{repo, mux}
+	service := &taskService{repo, mux, queue}
 
 	mux.HandleFunc("/task/", service.createTask).Methods("POST")
 	mux.HandleFunc("/task/", service.listTask).Methods("GET")
@@ -37,7 +38,7 @@ func newService(repo Repository) http.Handler {
 	return service
 }
 
-func (taskService) createTask(w http.ResponseWriter, req *http.Request) {
+func (s *taskService) createTask(w http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
 	var task TaskRequest
 	err := decoder.Decode(&task)
@@ -54,7 +55,7 @@ func (taskService) createTask(w http.ResponseWriter, req *http.Request) {
 	taskUUID := uuid.Must(uuid.NewV4())
 	task.ID = taskUUID.String()
 
-	taskQueue <- task
+	s.taskQueue <- task
 	log.Printf("Task %s queued", task.ID)
 
 	response := make(map[string]string)
@@ -98,7 +99,7 @@ func (s *taskService) listTask(w http.ResponseWriter, req *http.Request) {
 	}
 
 	sortedTasks := s.repo.List()
-	utils.ResponseJSON(w, http.StatusOK, paginateTasks(sortedTasks, page, size))
+	utils.ResponseJSON(w, http.StatusOK, paginateTasks(sortedTasks, page-1, size))
 }
 
 func paginateTasks(tasks []CompletedTask, skip int, size int) []CompletedTask {

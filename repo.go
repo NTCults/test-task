@@ -55,7 +55,6 @@ func (repo *inMemoryRepo) List() []CompletedTask {
 	defer repo.mu.RUnlock()
 
 	sortedTasks := make([]CompletedTask, 0, len(repo.data))
-
 	for _, t := range repo.data {
 		sortedTasks = append(sortedTasks, t)
 	}
